@@ -1,5 +1,6 @@
-# Optional: Python build and test. Copy to .github/workflows/ci.yml, adjust the commands, and keep the final job
-# named `build-ok`: it is the one required check, so a matrix can change without editing the ruleset.
+# Optional: for a repository with nothing to build yet (docs, configuration). Copy to .github/workflows/ci.yml. The
+# job is named `build-ok` so the ruleset's required check exists from the start; replace its step with the real build
+# and tests when there is code.
 name: ci
 
 on:
@@ -10,25 +11,10 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  test:
+  build-ok:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-      - run: uv run pytest
-
-  build-ok:
-    if: always()
-    needs: [test]
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Every job passed
-        env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
-        run: |
-          case " $RESULTS " in *" failure "* | *" cancelled "*) exit 1 ;; esac
+      - name: Nothing to build yet
+        run: echo "no build"
